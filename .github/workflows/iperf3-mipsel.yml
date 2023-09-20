@@ -35,7 +35,7 @@ jobs:
         run: |
           mkdir -p ./musl_gcc 
           wget -c https://musl.cc/mipsel-linux-musl-cross.tgz -P /opt/musl_gcc/
-          tar zxf ./musl_gcc/mipsel-linux-musl-cross.tgz -C /optmusl_gcc/
+          tar zxf /opt/musl_gcc/mipsel-linux-musl-cross.tgz -C /opt/musl_gcc/
           export CC=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-gcc
           export LD=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-ld
           export AR=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-ar
