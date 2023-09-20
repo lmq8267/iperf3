@@ -33,22 +33,15 @@ jobs:
         uses: snickerbockers/submodules-init@v4
       - name: 编译
         run: |
-          mkdir -p ./musl_gcc 
-          wget -c https://musl.cc/mipsel-linux-musl-cross.tgz -P ./musl_gcc/
-          tar zxf ./musl_gcc/mipsel-linux-musl-cross.tgz -C ./musl_gcc/
-          sudo rm -rf /usr/bin/gcc
-          sudo rm -rf /usr/bin/ld
-          sudo rm -rf /usr/bin/ar
-          sudo ln -s $(pwd)/musl_gcc/mipsel-linux-musl-cross/bin/*ar /usr/bin/ar
-          sudo ln -s $(pwd)/musl_gcc/mipsel-linux-musl-cross/bin/*ld /usr/bin/ld
-          sudo ln -s $(pwd)/musl_gcc/mipsel-linux-musl-cross/bin/*gcc /usr/bin/
+          sudo apt-get update 
+          sudo apt-get install gcc-mipsel-linux-gnu
           git clone https://github.com/esnet/iperf -b $vntsv /opt/iperf
           git clone https://github.com/lmq8267/cloudflared.git /opt/st
           tar -xvf /opt/st/upx-3.95-amd64_linux.tar.xz -C /opt
           chmod 777 /opt/upx-3.95-amd64_linux/upx
           chmod 777 /opt/st/strip
           cd /opt/iperf
-          ./configure CFLAGS="-static" --host=mipsel-linux-musl --build=x86 --target=mipsel-linux CC=/usr/bin/mipsel-linux-musl-gcc --without-openssl --disable-shared --enable-static
+          ./configure CFLAGS="-static" --host=mipsel-linux-gnu --build=x86 --target=mipsel-linux CC=mipsel-linux-gnu-gcc --without-openssl --disable-shared --enable-static
           make
           /opt/st/strip /opt/iperf/iperf3
           /opt/upx-3.95-amd64_linux/upx --lzma --best iperf3
