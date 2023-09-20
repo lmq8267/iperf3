@@ -34,11 +34,11 @@ jobs:
       - name: 编译
         run: |
           mkdir -p ./musl_gcc 
-          wget -c https://musl.cc/mipsel-linux-musl-cross.tgz -P ./musl_gcc/
-          tar zxf ./musl_gcc/mipsel-linux-musl-cross.tgz -C ./musl_gcc/
-          export CC=$(pwd)/musl_gcc/mipsel-linux-musl-cross/bin/*gcc
-          export LD=$(pwd)/musl_gcc/mipsel-linux-musl-cross/bin/*ld
-          export AR=$(pwd)/musl_gcc/mipsel-linux-musl-cross/bin/*ar
+          wget -c https://musl.cc/mipsel-linux-musl-cross.tgz -P /opt/musl_gcc/
+          tar zxf ./musl_gcc/mipsel-linux-musl-cross.tgz -C /optmusl_gcc/
+          export CC=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-gcc
+          export LD=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-ld
+          export AR=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-ar
           git clone https://github.com/esnet/iperf -b ${{ needs.check.outputs.ver }} /opt/iperf
           git clone https://github.com/lmq8267/cloudflared.git /opt/st
           tar -xvf /opt/st/upx-3.95-amd64_linux.tar.xz -C /opt
