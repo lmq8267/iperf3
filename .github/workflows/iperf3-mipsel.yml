@@ -51,22 +51,22 @@ jobs:
           chmod 777 /opt/st/strip
           wget -c https://musl.cc/aarch64-linux-musl-cross.tgz -P /opt/musl_gcc-arm64/
           tar zxf /opt/musl_gcc-arm64/aarch64-linux-musl-cross.tgz -C /opt/musl_gcc-arm64/
-          export CC=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc
-          export LD=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-ld
-          export AR=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-ar
           chmod 777 /opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip
           cd /opt/iperf
           ./configure LDFLAGS=-static --host=mipsel-linux-musl --build=x86 --target=mipsel-linux CC=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-gcc --without-openssl --disable-shared --enable-static-bin CFLAGS=-static
           make
-          mv /opt/iperf/src/iperf3 /opt/mipsel/iperf3_musl_mipsel
+          cp -rf /opt/iperf/src/iperf3 /opt/mipsel/iperf3_musl_mipsel
           /opt/st/strip /opt/mipsel/iperf3_musl_mipsel 
           cd /opt/mipsel
           /opt/upx-3.95-amd64_linux/upx --lzma --best iperf3_musl_mipsel
           cd /opt/iperf
           make clean
+          export CC=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc
+          export LD=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-ld
+          export AR=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-ar
           ./configure LDFLAGS=-static --host=aarch64-linux-musl --build=x86 --target=aarch64-linux CC=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc --without-openssl --disable-shared --enable-static-bin CFLAGS=-static
           make
-          mv /opt/iperf/src/iperf3 /opt/arm64/iperf3_musl_aarch64
+          cp -rf /opt/iperf/src/iperf3 /opt/arm64/iperf3_musl_aarch64
           /opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip /opt/arm64/iperf3_musl_aarch64
           cd /opt/arm64
           /opt/upx-4.1.0-amd64_linux/upx --lzma --best iperf3_musl_aarch64
