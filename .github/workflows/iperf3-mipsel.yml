@@ -1,0 +1,71 @@
+name: 编译mipsel版iperf3
+
+on:
+  #schedule:
+    #- cron: '0 3,20 * * *'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      ver: ${{ steps.getversion.outputs.ver }}
+      cver: ${{ steps.getversion.outputs.cver }}
+    steps:
+      -
+        name: 检查更新
+        id: getversion
+        run: |
+          ver=`curl https://api.github.com/repos/esnet/iperf/releases/latest | jq -r '.tag_name'`
+          cver=`curl https://api.github.com/repos/lmq8267/iperf3/releases/latest | jq -r '.tag_name'`
+          echo "ver=${ver}" >> $GITHUB_OUTPUT
+          echo "cver=${cver}" >> $GITHUB_OUTPUT
+
+  build:
+    runs-on: ubuntu-latest
+    needs: check
+    if: ${{ needs.check.outputs.ver != needs.check.outputs.cver }}
+    steps:
+      -
+        name: 检查代码仓库
+        uses: actions/checkout@v3
+      - name: Init submodules
+        uses: snickerbockers/submodules-init@v4
+      - name: 编译
+        run: |
+          mkdir -p ./musl_gcc 
+          wget -c https://musl.cc/mipsel-linux-musl-cross.tgz -P ./musl_gcc/
+          tar zxf ./musl_gcc/mipsel-linux-musl-cross.tgz -C ./musl_gcc/
+          rm -rf /usr/bin/gcc
+          rm -rf /usr/bin/ld
+          rm -rf /usr/bin/ar
+          sudo ln -s $(pwd)/musl_gcc/mipsel-linux-musl-cross/bin/*ar /usr/bin/ar
+          sudo ln -s $(pwd)/musl_gcc/mipsel-linux-musl-cross/bin/*ld /usr/bin/ld
+          sudo ln -s $(pwd)/musl_gcc/mipsel-linux-musl-cross/bin/*gcc /usr/bin/
+          git clone https://github.com/esnet/iperf -b $vntsv /opt/iperf
+          git clone https://github.com/lmq8267/cloudflared.git /opt/st
+          tar -xvf /opt/st/upx-3.95-amd64_linux.tar.xz -C /opt
+          chmod 777 /opt/upx-3.95-amd64_linux/upx
+          chmod 777 /opt/st/strip
+          cd /opt/iperf
+          ./configure CFLAGS="-static" --host=mipsel-linux-musl --build=x86 --target=mipsel-linux CC=/usr/bin/mipsel-linux-musl-gcc --disable-shared --enable-static
+          make
+          /opt/st/strip /opt/iperf/iperf3
+          /opt/upx-3.95-amd64_linux/upx --lzma --best iperf3
+          echo $(md5sum iperf3 | awk '{print $1;}') >MD5.txt
+      - 
+        name: 发布
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ secrets.c8 }}
+          tag_name: ${{ needs.check.outputs.ver }}
+          files: |
+              /opt/iperf/iperf3
+              /opt/iperf/MD5.txt
+      - 
+       name: 删除工作流
+       uses: GitRML/delete-workflow-runs@main
+       with:
+        token: ${{ secrets.c8 }}
+        retain_days: 2
+        keep_minimum_runs: 0
