@@ -56,7 +56,8 @@ jobs:
           ./configure LDFLAGS=-static --host=mipsel-linux-musl --build=x86 --target=mipsel-linux CC=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-gcc --without-openssl --disable-shared --enable-static-bin CFLAGS=-static
           make
           find /opt/iperf -name "iperf3"
-          cp -rf /opt/iperf/src/iperf3 /opt/mipsel/iperf3_musl_mipsel
+          mv ./src/iperf3 ./src/iperf3_musl_mipsel
+          cp -rf /opt/iperf/src/iperf3_musl_mipsel /opt/mipsel/iperf3_musl_mipsel
           /opt/st/strip /opt/mipsel/iperf3_musl_mipsel 
           cd /opt/mipsel
           /opt/upx-3.95-amd64_linux/upx --lzma --best iperf3_musl_mipsel
@@ -67,7 +68,8 @@ jobs:
           export AR=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-ar
           ./configure LDFLAGS=-static --host=aarch64-linux-musl --build=x86 --target=aarch64-linux CC=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc --without-openssl --disable-shared --enable-static-bin CFLAGS=-static
           make
-          cp -rf /opt/iperf/src/iperf3 /opt/arm64/iperf3_musl_aarch64
+          mv ./src/iperf3 ./src/iperf3_musl_aarch64
+          cp -rf /opt/iperf/src/iperf3_musl_aarch64 /opt/arm64/iperf3_musl_aarch64
           /opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip /opt/arm64/iperf3_musl_aarch64
           cd /opt/arm64
           /opt/upx-4.1.0-amd64_linux/upx --lzma --best iperf3_musl_aarch64
