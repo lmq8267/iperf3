@@ -41,8 +41,9 @@ jobs:
           chmod 777 /opt/upx-3.95-amd64_linux/upx
           chmod 777 /opt/st/strip
           cd /opt/iperf
-          ./configure CFLAGS=" -static " --host=mipsel-linux-gnu --build=x86 --target=mipsel-linux CC=mipsel-linux-gnu-gcc --without-openssl --disable-shared --enable-static
+          ./configure CFLAGS=" -static " --host=mipsel-linux-gnu --build=x86 --target=mipsel-linux CC=mipsel-linux-gnu-gcc --prefix=/opt/iperf --without-openssl --disable-shared --enable-static
           make
+          make install
           /opt/st/strip /opt/iperf/iperf3
           /opt/upx-3.95-amd64_linux/upx --lzma --best iperf3
           echo $(md5sum iperf3 | awk '{print $1;}') >MD5.txt
