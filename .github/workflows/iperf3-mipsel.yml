@@ -58,7 +58,7 @@ jobs:
           chmod 777 /opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip
           cd /opt/iperf
           make clean
-          ./configure LDFLAGS=-static --host=aarch64-linux-musl --build=x86 --target=mipsel-linux CC=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc --without-openssl --disable-shared --enable-static-bin CFLAGS=-static
+          ./configure LDFLAGS=-static --host=aarch64-linux-musl --build=x86 --target=aarch64-linux CC=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc --without-openssl --disable-shared --enable-static-bin CFLAGS=-static
           make
           cp -rf /opt/iperf/src/iperf3 /opt/arm64/iperf3_musl_aarch64
           /opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip /opt/mipsel/iperf3_musl_aarch64 
