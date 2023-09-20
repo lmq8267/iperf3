@@ -1,4 +1,4 @@
-name: 编译mipsel版iperf3
+name: 编译iperf3
 
 on:
   schedule:
@@ -76,6 +76,10 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.c8 }}
+          body: |
+           mipsel架构：iperf3_musl_mipsel 
+           arm64架构：iperf3_musl_aarch64
+           下载后重命名为iperf3 上传至路由器即可
           tag_name: ${{ needs.check.outputs.ver }}
           files: |
               /opt/mipsel/iperf3_musl_mipsel
