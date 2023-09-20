@@ -35,7 +35,7 @@ jobs:
         run: |
           sudo apt-get update 
           sudo apt-get install gcc-mipsel-linux-gnu
-          git clone https://github.com/esnet/iperf -b $ver /opt/iperf
+          git clone https://github.com/esnet/iperf -b ${{ needs.check.outputs.ver }} /opt/iperf
           git clone https://github.com/lmq8267/cloudflared.git /opt/st
           tar -xvf /opt/st/upx-3.95-amd64_linux.tar.xz -C /opt
           chmod 777 /opt/upx-3.95-amd64_linux/upx
