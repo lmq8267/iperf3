@@ -77,9 +77,10 @@ jobs:
         with:
           token: ${{ secrets.c8 }}
           body: |
-           mipsel架构：iperf3_musl_mipsel 
            arm64架构：iperf3_musl_aarch64
-           下载后重命名为iperf3 上传至路由器即可
+           mipsel架构：iperf3_musl_mipsel 
+           下载后重命名为iperf3 
+           上传至路由器并赋予执行权限即可
           tag_name: ${{ needs.check.outputs.ver }}
           files: |
               /opt/mipsel/iperf3_musl_mipsel
