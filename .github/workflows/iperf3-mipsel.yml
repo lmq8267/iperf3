@@ -45,7 +45,7 @@ jobs:
           chmod 777 /opt/upx-3.95-amd64_linux/upx
           chmod 777 /opt/st/strip
           cd /opt/iperf
-          ./configure LDFLAGS=-static --host=mipsel-linux-gnu --build=x86 --target=mipsel-linux CC=/opt/musl_gcc/mipsel-linux-musl-cross/bin/*gcc --without-openssl --disable-shared --enable-static-bin CFLAGS=-static
+          ./configure LDFLAGS=-static --host=mipsel-linux-gnu --build=x86 --target=mipsel-linux CC=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-gcc --without-openssl --disable-shared --enable-static-bin CFLAGS=-static
           make
           /opt/st/strip /opt/iperf/src/iperf3
           cd /opt/iperf/src
