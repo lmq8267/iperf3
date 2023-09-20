@@ -54,14 +54,20 @@ jobs:
           export CC=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc
           export LD=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-ld
           export AR=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-ar
-          
           chmod 777 /opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip
+          cd /opt/iperf
+          ./configure LDFLAGS=-static --host=mipsel-linux-musl --build=x86 --target=mipsel-linux CC=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-gcc --without-openssl --disable-shared --enable-static-bin CFLAGS=-static
+          make
+          cp -rf /opt/iperf/src/iperf3 /opt/mipsel/iperf3_musl_mipsel
+          /opt/st/strip /opt/mipsel/iperf3_musl_mipsel 
+          cd /opt/mipsel
+          /opt/upx-3.95-amd64_linux/upx --lzma --best iperf3_musl_mipsel
           cd /opt/iperf
           make clean
           ./configure LDFLAGS=-static --host=aarch64-linux-musl --build=x86 --target=aarch64-linux CC=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc --without-openssl --disable-shared --enable-static-bin CFLAGS=-static
           make
           cp -rf /opt/iperf/src/iperf3 /opt/arm64/iperf3_musl_aarch64
-          /opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip /opt/mipsel/iperf3_musl_aarch64 
+          /opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip /opt/arm64/iperf3_musl_aarch64
           cd /opt/arm64
           /opt/upx-4.1.0-amd64_linux/upx --lzma --best iperf3_musl_aarch64
           
@@ -73,7 +79,7 @@ jobs:
           tag_name: ${{ needs.check.outputs.ver }}
           files: |
               /opt/mipsel/iperf3_musl_mipsel
-              /opt/mipsel/iperf3_musl_aarch64 
+              /opt/arm64/iperf3_musl_aarch64 
       - 
        name: 删除工作流
        uses: GitRML/delete-workflow-runs@main
