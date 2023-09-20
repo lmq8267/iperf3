@@ -43,6 +43,7 @@ jobs:
           cd /opt/iperf
           ./configure CFLAGS="-static" --host=mipsel-linux-gnu --build=x86 --target=mipsel-linux CC=mipsel-linux-gnu-gcc --without-openssl --disable-shared --enable-static
           make
+          find /opt/iperf -name "iperf3"
           /opt/st/strip /opt/iperf/iperf3
           /opt/upx-3.95-amd64_linux/upx --lzma --best iperf3
           echo $(md5sum iperf3 | awk '{print $1;}') >MD5.txt
