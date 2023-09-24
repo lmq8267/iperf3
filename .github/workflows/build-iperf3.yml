@@ -4,6 +4,8 @@ on:
   schedule:
     - cron: '0 3,20 * * *'
   workflow_dispatch:
+env:
+  TZ: Asia/Shanghai
 
 jobs:
   check:
@@ -70,15 +72,19 @@ jobs:
           /opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip /opt/arm64/iperf3_musl_aarch64
           cd /opt/arm64
           /opt/upx-4.1.0-amd64_linux/upx --lzma --best iperf3_musl_aarch64
-          
+          echo "build_time=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
       - 
         name: 发布
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.c8 }}
           body: |
+           编译时间 ：${{ env.build_time }}
+           
            arm64架构：iperf3_musl_aarch64
+           
            mipsel架构：iperf3_musl_mipsel 
+
            下载后重命名为iperf3 
            上传至路由器并赋予执行权限即可
           tag_name: ${{ needs.check.outputs.ver }}
