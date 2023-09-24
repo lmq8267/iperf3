@@ -39,6 +39,7 @@ jobs:
           mkdir -p ./musl_gcc-arm64
           mkdir -p /opt/mipsel
           mkdir -p /opt/arm64
+          sudo timedatectl set-timezone "Asia/Shanghai"
           wget -c https://musl.cc/mipsel-linux-musl-cross.tgz -P /opt/musl_gcc/
           tar zxf /opt/musl_gcc/mipsel-linux-musl-cross.tgz -C /opt/musl_gcc/
           export CC=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-gcc
