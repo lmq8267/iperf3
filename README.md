@@ -1,11 +1,14 @@
 
 项目地址：https://github.com/esnet/iperf
 
+
 启动为服务端  iperf3 -s
 
   间隔1秒  iperf3 -s -i 
   
   -p 指定端口
+
+  
 
 客户端测速 iperf3 -c 对端ip地址 -i 1 -t 40 -b 1000M 
 
