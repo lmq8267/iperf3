@@ -4,7 +4,7 @@
 
 启动为服务端  iperf3 -s
 
-  间隔1秒  iperf3 -s -i 
+  间隔1秒  iperf3 -s -i 1
   
   -p 指定端口
 
