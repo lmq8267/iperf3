@@ -80,14 +80,15 @@ jobs:
         with:
           token: ${{ secrets.c8 }}
           body: |
-           编译时间 ：${{ env.build_time }}
+           > ### 编译时间 ：${{ env.build_time }}
            
-           arm64架构：iperf3_musl_aarch64
+           - **arm64架构**：iperf3_musl_aarch64
            
-           mipsel架构：iperf3_musl_mipsel 
+           - **mipsel架构**：iperf3_musl_mipsel 
 
-           下载后重命名为iperf3 
-           上传至路由器并赋予执行权限即可
+           下载后重命名为iperf3 , 上传至路由器并赋予执行权限即可
+
+           **[官方更新说明](https://github.com/esnet/iperf/releases)**
           tag_name: ${{ needs.check.outputs.ver }}
           files: |
               /opt/mipsel/iperf3_musl_mipsel
