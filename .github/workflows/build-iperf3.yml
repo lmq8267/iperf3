@@ -58,9 +58,9 @@ jobs:
           tar zxf /opt/musl_gcc-arm64/aarch64-linux-musl-cross.tgz -C /opt/musl_gcc-arm64/
           chmod 777 /opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip
           cd /opt/iperf
-          ./configure LDFLAGS="-static -latomic -lpthread -no-pie" --host=mipsel-linux-musl \ 
-          --build=x86 --target=mipsel-linux CC=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-gcc \
-          --without-openssl --disable-shared --enable-static-bin CFLAGS="-static -latomic -lpthread -no-pie"
+          ./configure LDFLAGS="-static -latomic -lpthread -no-pie" --host=mipsel-linux-musl --build=x86 --target=mipsel-linux \
+          CC=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-gcc --without-openssl \
+          --disable-shared --enable-static-bin CFLAGS="-latomic -static -pthread -no-pie"
           make
           cp -rf /opt/iperf/src/iperf3 /opt/mipsel/iperf3_musl_mipsel
           /opt/st/strip /opt/mipsel/iperf3_musl_mipsel 
