@@ -45,6 +45,8 @@ jobs:
           export CC=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-gcc
           export LD=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-ld
           export AR=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-ar
+          export RANLIB=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-ranlib
+          rm -rf /opt/musl_gcc/mipsel-linux-musl-cross/mipsel-linux-musl/lib/*.la
           git clone https://github.com/esnet/iperf -b ${{ needs.check.outputs.ver }} /opt/iperf
           git clone https://github.com/lmq8267/cloudflared.git /opt/st
           tar -xvf /opt/st/upx-3.95-amd64_linux.tar.xz -C /opt
@@ -56,7 +58,9 @@ jobs:
           tar zxf /opt/musl_gcc-arm64/aarch64-linux-musl-cross.tgz -C /opt/musl_gcc-arm64/
           chmod 777 /opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip
           cd /opt/iperf
-          ./configure LDFLAGS=-static --host=mipsel-linux-musl --build=x86 --target=mipsel-linux CC=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-gcc --without-openssl --disable-shared --enable-static-bin CFLAGS=-static
+          ./configure LDFLAGS="-static -latomic -lpthread -no-pie" --host=mipsel-linux-musl \ 
+          --build=x86 --target=mipsel-linux CC=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-gcc \
+          --without-openssl --disable-shared --enable-static-bin CFLAGS="-static -latomic -lpthread -no-pie"
           make
           cp -rf /opt/iperf/src/iperf3 /opt/mipsel/iperf3_musl_mipsel
           /opt/st/strip /opt/mipsel/iperf3_musl_mipsel 
@@ -67,7 +71,11 @@ jobs:
           export CC=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc
           export LD=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-ld
           export AR=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-ar
-          ./configure LDFLAGS=-static --host=aarch64-linux-musl --build=x86 --target=aarch64-linux CC=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc --without-openssl --disable-shared --enable-static-bin CFLAGS=-static
+          export RANLIB=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-ranlib
+          rm -rf /opt/musl_gcc-arm64/aarch64-linux-musl-cross/aarch64-linux-musl/lib/*.la
+          ./configure LDFLAGS="-static -latomic -lpthread -no-pie" --host=aarch64-linux-musl \
+          --build=x86 --target=aarch64-linux CC=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc \
+          --without-openssl --disable-shared --enable-static-bin CFLAGS="-static -latomic -lpthread -no-pie"
           make
           cp -rf /opt/iperf/src/iperf3 /opt/arm64/iperf3_musl_aarch64
           /opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip /opt/arm64/iperf3_musl_aarch64
