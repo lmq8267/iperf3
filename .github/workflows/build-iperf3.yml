@@ -40,13 +40,14 @@ jobs:
           mkdir -p /opt/mipsel
           mkdir -p /opt/arm64
           sudo timedatectl set-timezone "Asia/Shanghai"
-          wget -q -c https://musl.cc/mipsel-linux-musl-cross.tgz -P /opt/musl_gcc/
-          tar zxf /opt/musl_gcc/mipsel-linux-musl-cross.tgz -C /opt/musl_gcc/
-          export CC=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-gcc
-          export LD=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-ld
-          export AR=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-ar
-          export RANLIB=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-ranlib
-          rm -rf /opt/musl_gcc/mipsel-linux-musl-cross/mipsel-linux-musl/lib/*.la
+          wget -q -c https://downloads.openwrt.org/releases/22.03.5/targets/ramips/mt7621/openwrt-toolchain-22.03.5-ramips-mt7621_gcc-11.2.0_musl.Linux-x86_64.tar.xz -P /opt/musl_gcc/
+          tar xJf /opt/musl_gcc/openwrt-toolchain-22.03.5-ramips-mt7621_gcc-11.2.0_musl.Linux-x86_64.tar.xz -C /opt/musl_gcc/
+          export CC=/opt/musl_gcc/openwrt-toolchain-22.03.5-ramips-mt7621_gcc-11.2.0_musl.Linux-x86_64/toolchain-mipsel_24kc_gcc-11.2.0_musl/bin/mipsel-openwrt-linux-musl-gcc
+          export LD=/opt/musl_gcc/openwrt-toolchain-22.03.5-ramips-mt7621_gcc-11.2.0_musl.Linux-x86_64/toolchain-mipsel_24kc_gcc-11.2.0_musl/bin/mipsel-openwrt-linux-musl-ld
+          export AR=/opt/musl_gcc/openwrt-toolchain-22.03.5-ramips-mt7621_gcc-11.2.0_musl.Linux-x86_64/toolchain-mipsel_24kc_gcc-11.2.0_musl/bin/mipsel-openwrt-linux-musl-ar
+          export RANLIB=/opt/musl_gcc/openwrt-toolchain-22.03.5-ramips-mt7621_gcc-11.2.0_musl.Linux-x86_64/toolchain-mipsel_24kc_gcc-11.2.0_musl/bin/mipsel-openwrt-linux-musl-ranlib
+          rm -rf /opt/musl_gcc/openwrt-toolchain-22.03.5-ramips-mt7621_gcc-11.2.0_musl.Linux-x86_64/toolchain-mipsel_24kc_gcc-11.2.0_musl/lib/*.la
+          export STAGING_DIR=/opt/musl_gcc/openwrt-toolchain-22.03.5-ramips-mt7621_gcc-11.2.0_musl.Linux-x86_64/toolchain-mipsel_24kc_gcc-11.2.0_musl
           git clone https://github.com/esnet/iperf -b ${{ needs.check.outputs.ver }} /opt/iperf
           git clone https://github.com/lmq8267/cloudflared.git /opt/st
           tar -xvf /opt/st/upx-3.95-amd64_linux.tar.xz -C /opt
@@ -59,11 +60,11 @@ jobs:
           chmod 777 /opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip
           cd /opt/iperf
           ./configure LDFLAGS="-static -latomic -lpthread -no-pie" --host=mipsel-linux-musl --build=x86 --target=mipsel-linux \
-          CC=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-gcc --without-openssl \
-          --disable-shared --enable-static-bin CFLAGS="-latomic -static -pthread -no-pie"
+          CC=/opt/musl_gcc/openwrt-toolchain-22.03.5-ramips-mt7621_gcc-11.2.0_musl.Linux-x86_64/toolchain-mipsel_24kc_gcc-11.2.0_musl/bin/mipsel-openwrt-linux-musl-gcc \
+          --without-openssl --disable-shared --enable-static-bin CFLAGS="-latomic -static -pthread -no-pie"
           make
           cp -rf /opt/iperf/src/iperf3 /opt/mipsel/iperf3_musl_mipsel
-          /opt/st/strip /opt/mipsel/iperf3_musl_mipsel 
+          /opt/musl_gcc/openwrt-toolchain-22.03.5-ramips-mt7621_gcc-11.2.0_musl.Linux-x86_64/toolchain-mipsel_24kc_gcc-11.2.0_musl/bin/mipsel-openwrt-linux-musl-strip /opt/mipsel/iperf3_musl_mipsel 
           cd /opt/mipsel
           /opt/upx-3.95-amd64_linux/upx --lzma --best iperf3_musl_mipsel
           cd /opt/iperf
