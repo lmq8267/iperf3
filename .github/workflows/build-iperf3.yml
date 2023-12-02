@@ -40,7 +40,7 @@ jobs:
           mkdir -p /opt/mipsel
           mkdir -p /opt/arm64
           sudo timedatectl set-timezone "Asia/Shanghai"
-          wget -c https://musl.cc/mipsel-linux-musl-cross.tgz -P /opt/musl_gcc/
+          wget -q -c https://musl.cc/mipsel-linux-musl-cross.tgz -P /opt/musl_gcc/
           tar zxf /opt/musl_gcc/mipsel-linux-musl-cross.tgz -C /opt/musl_gcc/
           export CC=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-gcc
           export LD=/opt/musl_gcc/mipsel-linux-musl-cross/bin/mipsel-linux-musl-ld
@@ -54,7 +54,7 @@ jobs:
           chmod 777 /opt/upx-3.95-amd64_linux/upx
           chmod 777 /opt/upx-4.1.0-amd64_linux/upx
           chmod 777 /opt/st/strip
-          wget -c https://musl.cc/aarch64-linux-musl-cross.tgz -P /opt/musl_gcc-arm64/
+          wget -q -c https://musl.cc/aarch64-linux-musl-cross.tgz -P /opt/musl_gcc-arm64/
           tar zxf /opt/musl_gcc-arm64/aarch64-linux-musl-cross.tgz -C /opt/musl_gcc-arm64/
           chmod 777 /opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip
           cd /opt/iperf
