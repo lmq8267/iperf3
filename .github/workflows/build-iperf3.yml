@@ -59,7 +59,7 @@ jobs:
           tar zxf /opt/musl_gcc-arm64/aarch64-linux-musl-cross.tgz -C /opt/musl_gcc-arm64/
           chmod 777 /opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip
           cd /opt/iperf
-          ./configure LDFLAGS="-static -latomic -lpthread -no-pie" --host=mipsel-linux-musl --build=x86 --target=mipsel-linux \
+          ./configure LDFLAGS="-static -latomic -lpthread" --host=mipsel-linux-musl --build=x86 --target=mipsel-linux \
           CC=/opt/musl_gcc/openwrt-toolchain-22.03.5-ramips-mt7621_gcc-11.2.0_musl.Linux-x86_64/toolchain-mipsel_24kc_gcc-11.2.0_musl/bin/mipsel-openwrt-linux-musl-gcc \
           --without-openssl --disable-shared --enable-static-bin CFLAGS="-latomic -static -pthread"
           make
@@ -74,7 +74,7 @@ jobs:
           export AR=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-ar
           export RANLIB=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-ranlib
           rm -rf /opt/musl_gcc-arm64/aarch64-linux-musl-cross/aarch64-linux-musl/lib/*.la
-          ./configure LDFLAGS="-static -latomic -lpthread -no-pie" --host=aarch64-linux-musl \
+          ./configure LDFLAGS="-static -latomic -lpthread" --host=aarch64-linux-musl \
           --build=x86 --target=aarch64-linux CC=/opt/musl_gcc-arm64/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc \
           --without-openssl --disable-shared --enable-static-bin CFLAGS="-static -latomic -lpthread"
           make
