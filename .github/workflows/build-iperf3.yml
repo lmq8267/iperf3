@@ -19,14 +19,14 @@ jobs:
         id: getversion
         run: |
           ver=`curl https://api.github.com/repos/esnet/iperf/releases/latest | jq -r '.tag_name'`
-          cver=`curl https://api.github.com/repos/lmq8267/iperf3/releases/latest | jq -r '.tag_name'`
+          cver=`curl https://api.github.com/repos/lmq8267/iperf/releases/latest | jq -r '.tag_name'`
           echo "ver=${ver}" >> $GITHUB_OUTPUT
           echo "cver=${cver}" >> $GITHUB_OUTPUT
 
   build:
     runs-on: ubuntu-latest
     needs: check
-    if: ${{ needs.check.outputs.ver = needs.check.outputs.cver }}
+    if: ${{ needs.check.outputs.ver != needs.check.outputs.cver }}
     steps:
       -
         name: 检查代码仓库
