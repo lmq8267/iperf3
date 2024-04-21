@@ -19,7 +19,7 @@ jobs:
         id: getversion
         run: |
           ver=`curl https://api.github.com/repos/esnet/iperf/releases/latest | jq -r '.tag_name'`
-          cver=`curl https://api.github.com/repos/lmq8267/iperf/releases/latest | jq -r '.tag_name'`
+          cver=`curl https://api.github.com/repos/lmq8267/iperf3/releases/latest | jq -r '.tag_name'`
           echo "ver=${ver}" >> $GITHUB_OUTPUT
           echo "cver=${cver}" >> $GITHUB_OUTPUT
 
