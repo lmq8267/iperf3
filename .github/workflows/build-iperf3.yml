@@ -6,7 +6,9 @@ on:
   workflow_dispatch:
 env:
   TZ: Asia/Shanghai
-
+permissions:
+  contents: write
+  actions: write
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -14,14 +16,19 @@ jobs:
       ver: ${{ steps.getversion.outputs.ver }}
       cver: ${{ steps.getversion.outputs.cver }}
     steps:
-      -
-        name: 检查更新
+      - name: 检查更新
         id: getversion
         run: |
           ver=`curl https://api.github.com/repos/esnet/iperf/releases/latest | jq -r '.tag_name'`
-          cver=`curl https://api.github.com/repos/lmq8267/iperf3/releases/latest | jq -r '.tag_name'`
+          cver=`curl https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r '.tag_name'`
           echo "ver=${ver}" >> $GITHUB_OUTPUT
           echo "cver=${cver}" >> $GITHUB_OUTPUT
+      - name: delete-workflow
+        uses: Mattraks/delete-workflow-runs@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          retain_days: 0
+          keep_minimum_runs: 0
 
   build:
     runs-on: ubuntu-latest
@@ -30,9 +37,7 @@ jobs:
     steps:
       -
         name: 检查代码仓库
-        uses: actions/checkout@v3
-      - name: Init submodules
-        uses: snickerbockers/submodules-init@v4
+        uses: actions/checkout@v4
       - name: 编译
         run: |
           mkdir -p ./musl_gcc 
@@ -85,9 +90,9 @@ jobs:
           echo "build_time=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
       - 
         name: 发布
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
-          token: ${{ secrets.c8 }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           body: |
            > ### 编译时间 ：${{ env.build_time }}
            
@@ -102,19 +107,13 @@ jobs:
           files: |
               /opt/mipsel/iperf3_musl_mipsel
               /opt/arm64/iperf3_musl_aarch64 
-      - 
-       name: 删除工作流
-       uses: GitRML/delete-workflow-runs@main
-       with:
-        token: ${{ secrets.c8 }}
-        retain_days: 2
-        keep_minimum_runs: 1
   keepalive-workflow:
     # github超过60天未提交将自动停止工作流
     name: 工作流保活 
     runs-on: ubuntu-latest
     permissions:
       actions: write
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: gautamkrishnar/keepalive-workflow@v2
