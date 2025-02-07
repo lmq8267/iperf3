@@ -167,7 +167,7 @@ jobs:
          dos2unix ./bootstrap.sh
          dos2unix ./configure
          ./bootstrap.sh 
-         ./configure --disable-shared --enable-static --enable-static-bin --prefix=$(pwd)
+         ./configure LDFLAGS="$LDFLAGS -static" CFLAGS="$CFLAGS -static" --disable-shared --enable-static --enable-static-bin --prefix=$(pwd)
          make 
          make install 
          file ./bin/iperf3 
