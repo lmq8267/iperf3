@@ -176,6 +176,7 @@ jobs:
          mv ./bin/iperf3 ./iperf3/
          zip -r iperf3-${{ matrix.target }}.zip iperf3
          mv iperf3-${{ matrix.target }}.zip ./bin/
+         git config --global --add safe.directory $(pwd)
      - name: 编译 FreeBSD
        if: ${{ endsWith(matrix.target, 'freebsd') }}
        uses: cross-platform-actions/action@master
