@@ -1,5 +1,7 @@
 name: AAAAAAAAAAAAiperf3-build
 on:
+  schedule:
+    - cron: '0 20 * * *'
   workflow_dispatch:
     inputs:
       branch:
@@ -16,22 +18,43 @@ on:
         required: true
         default: false
         type: boolean
-      tag:
-        description: '指定Release的版本号（留空为源码提交哈希值）'
-        required: false
-        default: ''
+      bj:
+        description: '强制使用手动编译'
+        required: true
+        default: false
+        type: boolean
   
 env:
   branch: "${{ github.event.inputs.branch }}"
-  tag: "${{ github.event.inputs.tag }}"
   rel: "${{ github.event.inputs.rel }}"
   TZ: Asia/Shanghai
 permissions:
   contents: write
   actions: write
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      ver: ${{ steps.getversion.outputs.ver }}
+      cver: ${{ steps.getversion.outputs.cver }}
+    steps:
+    - name: 检查更新
+      id: getversion
+      run: |
+        ver=`curl https://api.github.com/repos/esnet/iperf/releases/latest | jq -r '.tag_name'`
+        cver=`curl https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r '.tag_name'`
+        echo "ver=${ver}" >> $GITHUB_OUTPUT
+        echo "cver=${cver}" >> $GITHUB_OUTPUT
+    -  name: 删除工作流
+       uses: Mattraks/delete-workflow-runs@main
+       with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        retain_days: 0
+        keep_minimum_runs: 0
   build:
+    needs: check
     name: Build ${{ matrix.target }}
+    if: ${{ github.event.inputs.bj == 'true' || (github.event.inputs.bj != 'true' && needs.check.outputs.ver != needs.check.outputs.cver) }}
     strategy:
       fail-fast: false
       matrix:
@@ -118,7 +141,7 @@ jobs:
        uses: actions/checkout@v4
        with:
         repository: esnet/iperf
-        ref: ${{ env.branch }}
+        ref: ${{ needs.check.outputs.ver }}
      - name: 下载linux-musl-gcc
        if: ${{ runner.os == 'Linux' && !endsWith(matrix.target, 'openbsd') && !endsWith(matrix.target, 'freebsd') }}
        uses: lmq8267/dl-musl@main
@@ -139,6 +162,7 @@ jobs:
          make install
          $STRIP bin/iperf3
          file bin/iperf3
+         mv bin/iperf3 bin/iperf3-${{ matrix.target }}
      - name: 安装 Cygwin
        if: ${{ runner.os == 'Windows' }}
        uses: cygwin/cygwin-install-action@master
@@ -156,7 +180,9 @@ jobs:
          make 
          make install 
          file ./bin/iperf3 
-         cygcheck ./bin/iperf3.exe | grep 'cygwin' | awk '{print $NF}' | xargs -I{} cp -v {} ./bin/
+         find /cygdrive -name 'cygwin1.dll' -exec cp -v {} ./bin/ \;
+         zip -j bin/iperf3-${{ matrix.target }}.zip bin/*
+         find bin ! -name "iperf3-${{ matrix.target }}.zip" -type f -exec rm -v {} \;
      - name: 编译 FreeBSD
        if: ${{ endsWith(matrix.target, 'freebsd') }}
        uses: cross-platform-actions/action@master
@@ -178,6 +204,7 @@ jobs:
               gmake install
               strip bin/iperf3
               file bin/iperf3
+              mv bin/iperf3 bin/iperf3-${{ matrix.target }}
      - name: 编译 OpenBSD
        if: ${{ endsWith(matrix.target, 'openbsd') }}
        uses: cross-platform-actions/action@master
@@ -199,22 +226,16 @@ jobs:
               make install
               strip bin/iperf3
               file bin/iperf3
+              mv bin/iperf3 bin/iperf3-${{ matrix.target }}
      - uses: actions/upload-artifact@v4
        with:
-        name: iperf3-${{ env.branch }}-${{ matrix.target }}
+        name: iperf3-${{ needs.check.outputs.ver }}-${{ matrix.target }}
         path: bin/*
      - name: 打包
        if: github.event.inputs.rel == 'true'
-       shell: bash
        run: |
           echo "build_time=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
-          if [ -z "$TAG" ]; then
-              echo "tag=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-          fi
           echo "haxi=$(git rev-parse HEAD)" >> $GITHUB_ENV
-       env:
-        TAG: ${{ env.tag }}
-        TARGET: ${{ matrix.target }}
      - name: 发布Release
        if: github.event.inputs.rel == 'true'
        uses: softprops/action-gh-release@v2
@@ -226,15 +247,17 @@ jobs:
            ${{ env.lite_info }}
            [官方源码](https://github.com/esnet/iperf)
            
-          tag_name: ${{env.tag}}
+          tag_name: ${{ needs.check.outputs.ver }}
           files: bin/*
-  del:
+  keepalive-workflow:
+    # github超过60天未提交将自动停止工作流
+    name: 工作流保活 
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
     steps:
-      - name: 删除流程记录
-        if: github.event.inputs.del == 'true'
-        uses: Mattraks/delete-workflow-runs@main
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          retain_days: 0
-          keep_minimum_runs: 0
+      - uses: actions/checkout@v4
+      - uses: gautamkrishnar/keepalive-workflow@v2
+        #with:
+          #use_api: true
