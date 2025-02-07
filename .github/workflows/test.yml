@@ -4,15 +4,6 @@ on:
     - cron: '0 20 * * *'
   workflow_dispatch:
     inputs:
-      branch:
-        description: '编译iperf3源码的分支或版本号，默认主分支master'
-        required: true
-        default: '3.18'
-      del:
-        description: '是否删除历史编译的流程记录'
-        required: true
-        default: false
-        type: boolean
       rel:
         description: '编译完成后是否发布Release'
         required: true
