@@ -170,9 +170,11 @@ jobs:
          make 
          make install 
          file ./bin/iperf3 
-         find /cygdrive -name 'cygwin1.dll' -exec cp -v {} ./bin/ \;
-         zip -j bin/iperf3-${{ matrix.target }}.zip bin/*
-         find bin ! -name "iperf3-${{ matrix.target }}.zip" -type f -exec rm -v {} \;
+         mkdir -p iperf3
+         mv /cygdrive/c/cygwin/bin/cygwin1.dll ./iperf3/
+         mv ./bin/iperf3 ./iperf3/
+         zip -r iperf3-${{ matrix.target }}.zip iperf3
+         mv iperf3-${{ matrix.target }}.zip ./bin/
      - name: 编译 FreeBSD
        if: ${{ endsWith(matrix.target, 'freebsd') }}
        uses: cross-platform-actions/action@master
