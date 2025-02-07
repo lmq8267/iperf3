@@ -176,6 +176,7 @@ jobs:
          cp /cygdrive/c/cygwin/bin/cygwin1.dll ./iperf3/
          mv $HOME/iperf3/bin/iperf3 ./iperf3/
          zip -r iperf3-${{ matrix.target }}.zip iperf3
+         mkdir -p bin
          mv iperf3-${{ matrix.target }}.zip ./bin/
          git config --global --add safe.directory $(pwd)
      - name: 编译 FreeBSD
