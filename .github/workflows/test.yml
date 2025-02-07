@@ -247,8 +247,7 @@ jobs:
           body: |
            > ### 编译时间 ：${{ env.build_time }} [提交记录](https://github.com/esnet/iperf/tree/${{ env.haxi }})
            
-           ${{ env.lite_info }}
-           [官方源码](https://github.com/esnet/iperf)
+           [官方更新说明](https://github.com/esnet/iperf/releases)
            
           tag_name: ${{ needs.check.outputs.ver }}
           files: bin/*
