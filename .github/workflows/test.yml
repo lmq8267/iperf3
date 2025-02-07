@@ -16,8 +16,7 @@ on:
         type: boolean
   
 env:
-  branch: "${{ github.event.inputs.branch }}"
-  rel: "${{ github.event.inputs.rel }}"
+  rel: ${{ github.event.inputs.rel || 'true' }}
   TZ: Asia/Shanghai
 permissions:
   contents: write
