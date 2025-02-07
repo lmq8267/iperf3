@@ -151,10 +151,13 @@ jobs:
        run: |
          dos2unix ./bootstrap.sh
          dos2unix ./configure
+         pwd
          ./bootstrap.sh 
          ./configure --disable-shared --enable-static --enable-static-bin --prefix=$(pwd)/bin 
          make 
          make install 
+         ls -Ral
+         find $(pwd) -name "iperf3.exe" -exec mv {} $(pwd)/bin/ \;
          file bin/iperf3 
          cygcheck ./bin/iperf3.exe | grep 'cygwin' | awk '{print \$NF}' | xargs -I{} cp -v {} ./bin/
      - name: 编译 FreeBSD
