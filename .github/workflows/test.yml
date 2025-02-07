@@ -158,7 +158,7 @@ jobs:
        uses: cygwin/cygwin-install-action@master
        with:
         platform: ${{ matrix.arch }}
-        packages: "gcc-core,gcc-g++,make,automake,autoconf,libtool,git,wget"
+        packages: "gcc-core,gcc-g++,make,automake,autoconf,libtool,git,wget,zip"
      - name: 编译 Windows
        if: ${{ runner.os == 'Windows' }}
        shell: C:\cygwin\bin\bash.exe -eo pipefail -o igncr '{0}'
