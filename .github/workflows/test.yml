@@ -1,0 +1,238 @@
+name: AAAAAAAAAAAAiperf3-build
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: '编译iperf3源码的分支或版本号，默认主分支master'
+        required: true
+        default: '3.18'
+      del:
+        description: '是否删除历史编译的流程记录'
+        required: true
+        default: false
+        type: boolean
+      rel:
+        description: '编译完成后是否发布Release'
+        required: true
+        default: false
+        type: boolean
+      tag:
+        description: '指定Release的版本号（留空为源码提交哈希值）'
+        required: false
+        default: ''
+  
+env:
+  branch: "${{ github.event.inputs.branch }}"
+  tag: "${{ github.event.inputs.tag }}"
+  rel: "${{ github.event.inputs.rel }}"
+  TZ: Asia/Shanghai
+permissions:
+  contents: write
+  actions: write
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - target: x86_64-pc-windows
+          os: windows-latest
+          arch: x86_64
+
+        - target: i686-pc-windows
+          os: windows-latest
+          arch: x86
+          
+        - target: aarch64-linux-musl
+          os: ubuntu-latest
+          URL: aarch64-linux-musl
+          
+        - target: x86_64-linux-musl
+          os: ubuntu-latest
+          URL: x86_64-linux-musl
+            
+        - target: i686-linux-musl
+          os: ubuntu-latest
+          URL: i686-linux-musl
+        
+        - target: armv7-linux-musleabihf
+          os: ubuntu-latest
+          URL: armv7l-linux-musleabihf
+
+        - target: armv7-linux-musleabi
+          os: ubuntu-latest
+          URL: armv7m-linux-musleabi
+          
+        - target: arm-linux-musleabihf
+          os: ubuntu-latest
+          URL: arm-linux-musleabihf
+
+        - target: arm-linux-musleabi
+          os: ubuntu-latest
+          URL: arm-linux-musleabi
+
+        - target: mipsel-linux-musl
+          os: ubuntu-latest
+          URL: mipsel-linux-muslsf
+
+        - target: mips-linux-musl
+          os: ubuntu-latest
+          URL: mips-linux-muslsf
+
+        - target: mips64-linux-musl
+          os: ubuntu-latest
+          URL: mips-linux-musl
+
+        - target: s390x-linux-musl
+          os: ubuntu-latest
+          URL: s390x-linux-musl
+
+        - target: loongarch64-linux-musl
+          os: ubuntu-latest
+          URL: loongarch64-linux-musl
+
+        - target: x86_64-freebsd
+          os: ubuntu-latest
+          arch: x86-64
+          version: '14.2'
+
+        - target: x86_64-openbsd
+          os: ubuntu-latest
+          arch: x86-64
+          version: '7.6'
+
+        - target: arm64-freebsd
+          os: ubuntu-latest
+          arch: arm64
+          version: '14.2'
+
+        - target: arm64-openbsd
+          os: ubuntu-latest
+          arch: arm64
+          version: '7.6'
+
+    runs-on: ${{ matrix.os }}
+    steps:
+     - name: Checkout code
+       uses: actions/checkout@v4
+       with:
+        repository: esnet/iperf
+        ref: ${{ env.branch }}
+     - name: 下载linux-musl-gcc
+       if: ${{ runner.os == 'Linux' && !endsWith(matrix.target, 'openbsd') && !endsWith(matrix.target, 'freebsd') }}
+       uses: lmq8267/dl-musl@main
+       with:
+        target: ${{ matrix.URL }}
+        static: true
+        gccpath: /tmp
+     - name: 编译 Liunx 
+       if: ${{ runner.os == 'Linux' && !endsWith(matrix.target, 'openbsd') && !endsWith(matrix.target, 'freebsd') }}
+       run: |
+         export CC="$CC -static"
+         export CXX="$CXX -static"
+         mkdir -p bin
+         sudo find /tmp -name "*.la" -delete
+         ./bootstrap.sh
+         ./configure LDFLAGS="$LDFLAGS -latomic -lpthread" --host=${{ matrix.target }}  --target=${{ matrix.target }} --disable-shared --enable-static --enable-static-bin --prefix="$(pwd)"
+         make 
+         make install
+         $STRIP bin/iperf3
+         file bin/iperf3
+     - name: 安装 Cygwin
+       if: ${{ runner.os == 'Windows' }}
+       uses: cygwin/cygwin-install-action@master
+       with:
+        platform: ${{ matrix.arch }}
+        packages: "gcc-core,gcc-g++,make,automake,autoconf,libtool,git,wget"
+     - name: 编译 Windows
+       if: ${{ runner.os == 'Windows' }}
+       run: |
+         dos2unix ./bootstrap.sh 
+         ./bootstrap.sh 
+         ./configure --disable-shared --enable-static --enable-static-bin --prefix=$(pwd)/bin 
+         make 
+         make install 
+         file bin/iperf3 
+         cygcheck ./bin/iperf3.exe | grep 'cygwin' | awk '{print \$NF}' | xargs -I{} cp -v {} ./bin/
+     - name: 编译 FreeBSD
+       if: ${{ endsWith(matrix.target, 'freebsd') }}
+       uses: cross-platform-actions/action@master
+       with:
+         operating_system: freebsd
+         architecture: ${{ matrix.arch }}
+         version: ${{ matrix.version }}
+         shell: bash
+         memory: 5G
+         cpu_count: 4
+         run: |
+              sudo pkg install -y gmake autoconf automake libtool pkgconf
+              export CC="clang -static"
+              export CXX="clang++ -static"
+              mkdir -p bin
+              ./bootstrap.sh
+              ./configure --disable-shared --enable-static --enable-static-bin --prefix="$(pwd)"
+              gmake 
+              gmake install
+              strip bin/iperf3
+              file bin/iperf3
+     - name: 编译 OpenBSD
+       if: ${{ endsWith(matrix.target, 'openbsd') }}
+       uses: cross-platform-actions/action@master
+       with:
+         operating_system: openbsd
+         architecture: ${{ matrix.arch }}
+         version: ${{ matrix.version }}
+         shell: bash
+         memory: 5G
+         cpu_count: 4
+         run: |
+              sudo pkg_add make
+              export CC=clang
+              export CXX=clang++
+              mkdir -p bin
+              ./bootstrap.sh
+              ./configure --disable-shared --enable-static --enable-static-bin --prefix="$(pwd)"
+              make 
+              make install
+              strip bin/iperf3
+              file bin/iperf3
+     - uses: actions/upload-artifact@v4
+       with:
+        name: iperf3-${{ env.branch }}-${{ matrix.target }}
+        path: bin/*
+     - name: 打包
+       if: github.event.inputs.rel == 'true'
+       shell: bash
+       run: |
+          echo "build_time=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+          if [ -z "$TAG" ]; then
+              echo "tag=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          fi
+          echo "haxi=$(git rev-parse HEAD)" >> $GITHUB_ENV
+       env:
+        TAG: ${{ env.tag }}
+        TARGET: ${{ matrix.target }}
+     - name: 发布Release
+       if: github.event.inputs.rel == 'true'
+       uses: softprops/action-gh-release@v2
+       with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+           > ### 编译时间 ：${{ env.build_time }} [提交记录](https://github.com/esnet/iperf/tree/${{ env.haxi }})
+           
+           ${{ env.lite_info }}
+           [官方源码](https://github.com/esnet/iperf)
+           
+          tag_name: ${{env.tag}}
+          files: bin/*
+  del:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 删除流程记录
+        if: github.event.inputs.del == 'true'
+        uses: Mattraks/delete-workflow-runs@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          retain_days: 0
+          keep_minimum_runs: 0
