@@ -147,8 +147,8 @@ jobs:
         packages: "gcc-core,gcc-g++,make,automake,autoconf,libtool,git,wget"
      - name: 编译 Windows
        if: ${{ runner.os == 'Windows' }}
+       shell: C:\cygwin\bin\bash.exe -eo pipefail -o igncr '{0}'
        run: |
-         dos2unix ./bootstrap.sh 
          ./bootstrap.sh 
          ./configure --disable-shared --enable-static --enable-static-bin --prefix=$(pwd)/bin 
          make 
