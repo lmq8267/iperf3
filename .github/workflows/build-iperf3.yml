@@ -167,13 +167,14 @@ jobs:
          dos2unix ./bootstrap.sh
          dos2unix ./configure
          ./bootstrap.sh 
-         ./configure LDFLAGS="$LDFLAGS -static" CFLAGS="$CFLAGS -static" --disable-shared --enable-static --enable-static-bin --prefix=$(pwd)
+         ./configure LDFLAGS="$LDFLAGS -static" CFLAGS="$CFLAGS -static" --disable-shared --enable-static --enable-static-bin --prefix=$HOME/iperf3
          make 
          make install 
-         file ./bin/iperf3 
+         file $HOME/iperf3/bin/iperf3 
          mkdir -p iperf3
+         $HOME/iperf3/bin/iperf3 -h
          cp /cygdrive/c/cygwin/bin/cygwin1.dll ./iperf3/
-         mv ./bin/iperf3 ./iperf3/
+         mv $HOME/iperf3/bin/iperf3 ./iperf3/
          zip -r iperf3-${{ matrix.target }}.zip iperf3
          mv iperf3-${{ matrix.target }}.zip ./bin/
          git config --global --add safe.directory $(pwd)
