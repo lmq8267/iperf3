@@ -171,7 +171,7 @@ jobs:
          make install 
          file ./bin/iperf3 
          mkdir -p iperf3
-         mv /cygdrive/c/cygwin/bin/cygwin1.dll ./iperf3/
+         cp /cygdrive/c/cygwin/bin/cygwin1.dll ./iperf3/
          mv ./bin/iperf3 ./iperf3/
          zip -r iperf3-${{ matrix.target }}.zip iperf3
          mv iperf3-${{ matrix.target }}.zip ./bin/
