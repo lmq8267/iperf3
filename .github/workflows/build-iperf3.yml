@@ -200,6 +200,8 @@ jobs:
               gmake install
               strip bin/iperf3
               file bin/iperf3
+              ldd bin/iperf3 || true
+              bin/iperf3 -h || true
               mv bin/iperf3 bin/iperf3-${{ matrix.target }}
      - name: 编译 OpenBSD
        if: ${{ endsWith(matrix.target, 'openbsd') }}
@@ -213,8 +215,8 @@ jobs:
          cpu_count: 4
          run: |
               sudo pkg_add make
-              export CC=clang
-              export CXX=clang++
+              export CC="clang -static"
+              export CXX="clang++ -static"
               mkdir -p bin
               ./bootstrap.sh
               ./configure --disable-shared --enable-static --enable-static-bin --prefix="$(pwd)"
@@ -222,6 +224,8 @@ jobs:
               make install
               strip bin/iperf3
               file bin/iperf3
+              ldd bin/iperf3 || true
+              bin/iperf3 -h || true
               mv bin/iperf3 bin/iperf3-${{ matrix.target }}
      - name: 安装 UPX
        if: ${{ runner.os == 'Linux' && !endsWith(matrix.target, 'openbsd') && !endsWith(matrix.target, 'freebsd') && !startsWith(matrix.target, 's390x') && !startsWith(matrix.target, 'loongarch64') }}
