@@ -245,7 +245,7 @@ jobs:
      - name: 设置变量
        if: github.event.inputs.rel == 'true'
        run: |
-          echo "build_time=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+          echo "build_time=$(date '+%Y年%m月%d日%H:%M:%S' | jq -sRr @uri)" >> $GITHUB_ENV
           echo "haxi=$(git rev-parse HEAD)" >> $GITHUB_ENV
      - name: 发布Release
        if: github.event.inputs.rel == 'true'
@@ -253,7 +253,9 @@ jobs:
        with:
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
-           > ### 编译时间 ：${{ env.build_time }} [提交记录](https://github.com/esnet/iperf/tree/${{ env.haxi }})
+           > ### ![](https://img.shields.io/badge/%E7%BC%96%E8%AF%91%E6%97%B6%E9%97%B4-${{ env.build_time }} -8267?logo=github&labelColor=%E9%A1%BB)![](https://img.shields.io/github/downloads/${GITHUB_REPOSITORY}/${{ needs.check.outputs.ver }}/total?label=%E4%B8%8B%E8%BD%BD%E6%AC%A1%E6%95%B0&logo=github) 
+           
+           [提交记录](https://github.com/esnet/iperf/tree/${{ env.haxi }})
            
            [官方更新说明](https://github.com/esnet/iperf/releases)
            
