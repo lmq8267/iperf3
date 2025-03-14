@@ -14,21 +14,126 @@
 项目地址：https://github.com/esnet/iperf
 
 
-启动为服务端  iperf3 -s
+### 作为服务端：
 
-  间隔1秒  iperf3 -s -i 1
-  
-  -p 指定端口
+```
+# 启动 iperf3 服务器，监听默认端口 5201
+iperf3 -s
 
-  
+# 启动服务器并指定监听端口
+iperf3 -s -p 5000
 
-客户端测速 iperf3 -c 对端ip地址 -i 1 -t 40 -b 1000M 
+# 以守护进程模式运行服务器
+iperf3 -s -D
 
--i间隔时间  -t 次数 -b 速率 -R 反转  也就是测试上行和下行
+# 服务器处理一个客户端连接后自动退出
+iperf3 -s -1
 
-iperf3 -c 192.168.20.5 -i 1 -t 40 -b 1000M -R
+# 限制服务器的总带宽，例如限制为 100Mbit/s
+iperf3 -s --server-bitrate-limit 100M
 
-iperf3 -c 192.168.20.5 -i 1 -t 40 -b 1000M 
+# 指定服务器监听的 IP 地址（适用于多网卡）
+iperf3 -s -B 192.168.1.1
 
+# 设置服务器端 CPU 绑定到特定核心，例如绑定到核心 2
+iperf3 -s -A 2
 
-测试udp  iperf3 -u -c 192.168.20.5 -i 1 -t 40 -b 1000M 
+# 以 JSON 格式输出测速结果
+iperf3 -s -J
+
+# 服务器端以 JSON 流模式输出数据
+iperf3 -s --json-stream
+
+# 服务器日志输出到指定文件
+iperf3 -s --logfile /var/log/iperf3.log
+
+# 在每个报告间隔强制刷新输出
+iperf3 -s --forceflush
+
+# 服务器空闲指定时间后自动重启（例如 300 秒）
+iperf3 -s --idle-timeout 300
+
+```
+
+### 作为客户端：
+
+```
+# 连接 iperf3 服务器进行测速（默认 TCP 模式）
+iperf3 -c 192.168.1.1
+
+# 连接服务器并指定端口
+iperf3 -c 192.168.1.1 -p 5000
+
+# 使用 UDP 模式进行测速
+iperf3 -c 192.168.1.1 -u
+
+# 设置 UDP 目标带宽（例如 50Mbit/s）
+iperf3 -c 192.168.1.1 -u -b 50M
+
+# 设定测速时间（例如 30 秒）
+iperf3 -c 192.168.1.1 -t 30
+
+# 设定要发送的总数据量（例如 100MB）
+iperf3 -c 192.168.1.1 -n 100M
+
+# 设定要发送的块数（例如 10000 块）
+iperf3 -c 192.168.1.1 -k 10000
+
+# 并行多个连接进行测速（例如 5 个）
+iperf3 -c 192.168.1.1 -P 5
+
+# 反向模式（服务器向客户端发送数据）
+iperf3 -c 192.168.1.1 -R
+
+# 双向模式（服务器和客户端同时发送和接收数据）
+iperf3 -c 192.168.1.1 --bidir
+
+# 设置 TCP 窗口大小（例如 512KB）
+iperf3 -c 192.168.1.1 -w 512K
+
+# 指定 TCP 拥塞控制算法（Linux & FreeBSD）
+iperf3 -c 192.168.1.1 -C cubic
+
+# 设置最大 TCP 段大小（MSS，例如 1460 字节）
+iperf3 -c 192.168.1.1 -M 1460
+
+# 禁用 Nagle 算法（适用于小数据包低延迟传输）
+iperf3 -c 192.168.1.1 -N
+
+# 强制使用 IPv4 进行测速
+iperf3 -c 192.168.1.1 -4
+
+# 强制使用 IPv6 进行测速
+iperf3 -c 192.168.1.1 -6
+
+# 设置 IP 服务类型（ToS 值，例如 64）
+iperf3 -c 192.168.1.1 -S 64
+
+# 指定 IPv6 Flow Label（仅支持 Linux）
+iperf3 -c 192.168.1.1 -L 100
+
+# 使用零拷贝（Zero-Copy）方式发送数据
+iperf3 -c 192.168.1.1 -Z
+
+# 在测试前进行预热，忽略前 N 秒的数据（例如 5 秒）
+iperf3 -c 192.168.1.1 -O 5
+
+# 设置每行输出的标题（用于日志标识）
+iperf3 -c 192.168.1.1 -T "测试1"
+
+# 以 JSON 格式输出测速结果
+iperf3 -c 192.168.1.1 -J
+
+# 让客户端获取服务器端的测速结果
+iperf3 -c 192.168.1.1 --get-server-output
+
+# 在 UDP 测试中使用 64-bit 计数器
+iperf3 -c 192.168.1.1 --udp-counters-64bit
+
+# 使用固定模式的 payload 数据（而不是随机数据）
+iperf3 -c 192.168.1.1 --repeating-payload
+
+# 设置 IPv4 数据包不分片
+iperf3 -c 192.168.1.1 --dont-fragment
+
+```
