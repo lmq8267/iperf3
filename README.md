@@ -137,3 +137,87 @@ iperf3 -c 192.168.1.1 --repeating-payload
 iperf3 -c 192.168.1.1 --dont-fragment
 
 ```
+
+### 帮助信息：
+
+```
+iperf3 -h
+用法: iperf3 [-s|-c 主机] [选项]
+       iperf3 [-h|--help] [-v|--version]
+
+服务器或客户端:
+  -p, --port      #         监听/连接的服务器端口
+  -f, --format   [kmgtKMGT] 结果显示格式: Kbits, Mbits, Gbits, Tbits
+  -i, --interval  #         生成吞吐量报告的时间间隔（秒）
+  -I, --pidfile file        将进程 ID 写入文件
+  -F, --file name           发送/接收指定文件
+  -A, --affinity n[,m]      设置 CPU 亲和性，绑定进程到核心 n
+                             （可选: 客户端可指定 m 作为服务器端核心号）
+  -B, --bind <主机>[%<设备>] 绑定到指定地址的网络接口
+                            （可选: <设备> 等效于 `--bind-dev <设备>`）
+  --bind-dev <设备>         绑定到指定网络接口 (使用 SO_BINDTODEVICE)
+  -V, --verbose             输出更详细的信息
+  -J, --json                以 JSON 格式输出
+  --json-stream             以行分隔的 JSON 格式输出
+  --logfile f               将输出发送到日志文件
+  --forceflush              强制在每个时间间隔刷新输出
+  --timestamps<=格式>       在每行输出前添加时间戳
+                            （可选: "=" 和 strftime(3) 兼容的格式字符串）
+  --rcv-timeout #           数据接收超时（默认 120000 毫秒）
+  --snd-timeout #           TCP 数据未确认超时（单位: 毫秒，默认为系统设置）
+  -d, --debug[=#]           输出调试信息
+                            （可选: "=" 设置调试级别 1-4，默认 4 - 全部消息）
+  -v, --version             显示版本信息并退出
+  -h, --help                显示本帮助信息并退出
+
+服务器专用:
+  -s, --server              以服务器模式运行
+  -D, --daemon              以守护进程模式运行服务器
+  -1, --one-off             处理一个客户端连接后退出
+  --server-bitrate-limit #[KMG][/#]   设置服务器的总比特率限制（默认 0 = 无限制）
+                            （可选: 斜杠后跟秒数，用于平均总数据速率，默认 5 秒）
+  --idle-timeout #          如果服务器空闲 # 秒则重启（默认: 不超时）
+
+客户端专用:
+  -c, --client <主机>[%<设备>] 以客户端模式运行，连接到 <主机>
+                              （可选: <设备> 等效于 `--bind-dev <设备>`）
+  -u, --udp                 使用 UDP 而非 TCP
+  --connect-timeout #       控制连接建立超时（毫秒）
+  -b, --bitrate #[KMG][/#]  目标比特率（单位: bit/sec，0 表示不限速）
+                            （UDP 默认 1 Mbit/sec，TCP 默认不限速）
+                            （可选: 斜杠后跟数据包数，用于突发模式）
+  --pacing-timer #[KMG]     服务器定时器节奏，单位: 微秒（默认 1000）
+                            （已废弃，仅用于兼容旧版本服务器）
+  -t, --time      #         发送数据的持续时间（秒）（默认 10 秒）
+  -n, --bytes     #[KMG]    发送指定字节数（替代 -t 选项）
+  -k, --blockcount #[KMG]   发送指定数据块数（替代 -t 或 -n 选项）
+  -l, --length    #[KMG]    读/写缓冲区长度
+                            （默认: TCP 128 KB, UDP 1460 或动态调整）
+  --cport         <端口>    绑定客户端特定端口（适用于 TCP 和 UDP，默认: 临时端口）
+  -P, --parallel  #         并行运行的客户端流数
+  -R, --reverse             反向模式（服务器发送，客户端接收）
+  --bidir                   双向模式（客户端和服务器同时发送和接收数据）
+  -w, --window    #[KMG]    设置发送/接收缓冲区大小
+                            （间接设置 TCP 窗口大小）
+  -C, --congestion <算法>   设置 TCP 拥塞控制算法（仅适用于 Linux 和 FreeBSD）
+  -M, --set-mss   #         设置 TCP/SCTP 最大段大小（MTU - 40 字节）
+  -N, --no-delay            禁用 Nagle 算法（启用 TCP/SCTP 低延迟模式）
+  -4, --version4            仅使用 IPv4
+  -6, --version6            仅使用 IPv6
+  -S, --tos N               设置 IP 服务类型（0-255）
+                            （支持十进制、八进制和十六进制，如 52, 064, 0x34）
+  --dscp N or --dscp val    设置 IP DSCP 值（0-63 或符号表示）
+                            （支持十进制、八进制和十六进制，参见 --tos）
+  -L, --flowlabel N         设置 IPv6 流标签（仅 Linux 支持）
+  -Z, --zerocopy            使用“零拷贝”方式发送数据
+  -O, --omit N              预热测试 N 秒，忽略预热期间的统计信息
+  -T, --title str           在每行输出前添加自定义前缀
+  --extra-data str          在客户端和服务器 JSON 输出中包含额外数据
+  --get-server-output       获取服务器端的测试结果
+  --udp-counters-64bit      使用 64 位计数器统计 UDP 测试数据包
+  --repeating-payload       使用重复模式填充数据，而非随机填充（类似 iperf2）
+  --dont-fragment           设置 IPv4 不分片（Don't Fragment）标志
+
+[KMG] 选项支持 K/M/G 后缀，分别代表千/兆/吉比特或字节。
+
+```
