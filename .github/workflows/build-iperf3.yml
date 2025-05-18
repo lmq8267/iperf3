@@ -217,7 +217,8 @@ jobs:
               sudo pkg_add make
               export CC="clang -static"
               export CXX="clang++ -static"
-              sed -i '' '/#include <setjmp.h>/i \
+              sed -i '/#include <setjmp.h>/i \
+              #include <setjmp.h>
               #include <stdarg.h>' src/iperf_api.h
               mkdir -p bin
               ./bootstrap.sh
