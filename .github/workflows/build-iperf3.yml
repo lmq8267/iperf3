@@ -214,12 +214,12 @@ jobs:
          memory: 5G
          cpu_count: 4
          run: |
-              sudo pkg_add make
+              sudo pkg_add make autoreconf automake libtool pkgconf
               export CC="clang -static"
               export CXX="clang++ -static"
               sed -i '/#include <setjmp.h>/i \
-              #include <setjmp.h>
-              #include <stdarg.h>' src/iperf_api.h
+              #include <stdarg.h>
+              ' src/iperf_api.h
               cat src/iperf_api.h
               mkdir -p bin
               ./bootstrap.sh
