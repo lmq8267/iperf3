@@ -220,6 +220,7 @@ jobs:
               sed -i '/#include <setjmp.h>/i \
               #include <setjmp.h>
               #include <stdarg.h>' src/iperf_api.h
+              cat src/iperf_api.h
               mkdir -p bin
               ./bootstrap.sh
               ./configure --disable-shared --enable-static --enable-static-bin --prefix="$(pwd)"
