@@ -246,7 +246,7 @@ jobs:
         name: iperf3-${{ needs.check.outputs.ver }}-${{ matrix.target }}
         path: bin/*
      - name: 设置变量
-       if: github.event.inputs.rel == 'true'
+       if: github.event.inputs.rel != 'true'
        run: |
           echo "build_time=$(date '+%Y年%m月%d日%H:%M:%S' | jq -sRr @uri)" >> $GITHUB_ENV
           echo "haxi=$(git rev-parse HEAD)" >> $GITHUB_ENV
