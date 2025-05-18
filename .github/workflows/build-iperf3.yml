@@ -214,13 +214,12 @@ jobs:
          memory: 5G
          cpu_count: 4
          run: |
-              sudo pkg_add make autoreconf automake libtool pkgconf
+              sudo pkg_add gmake autoconf automake-1.16.5 libtool pkgconf
               export CC="clang -static"
               export CXX="clang++ -static"
               sed -i '/#include <setjmp.h>/i \
               #include <stdarg.h>
               ' src/iperf_api.h
-              cat src/iperf_api.h
               mkdir -p bin
               ./bootstrap.sh
               ./configure --disable-shared --enable-static --enable-static-bin --prefix="$(pwd)"
