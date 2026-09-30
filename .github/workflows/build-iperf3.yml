@@ -215,7 +215,7 @@ jobs:
          memory: 5G
          cpu_count: 4
          run: |
-              sudo pkg_add gmake autoconf-2.72p0 automake-1.16.5 libtool pkgconf gcc-11
+              sudo pkg_add gmake autoconf-2.72p0 automake-1.16.5 libtool pkgconf  gcc-11.2.0p14
               which gcc-* || true
               export CC="gcc-11 -static"
               export CXX="g++-11 -static"
