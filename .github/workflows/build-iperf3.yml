@@ -166,7 +166,16 @@ jobs:
        run: |
          dos2unix ./bootstrap.sh
          dos2unix ./configure
-         ./bootstrap.sh 
+         ./bootstrap.sh
+         # Cygwin 的 gcc specs 无条件加 -lintl，全静态链接必须有 libintl.a；而 gettext 0.26 起
+         # libintl-devel 不再提供它（2026-11-22 实测 64 位因此报 cannot find -lintl）。
+         # iperf3 和 Cygwin 的 CRT 都不引用任何 libintl 符号，缺了就造一个带 dummy 目标文件的静态库补上。
+         if [ ! -f /usr/lib/libintl.a ]; then
+           printf 'typedef int dummy_libintl_t;\n' > /tmp/dummy_libintl.c
+           gcc -c /tmp/dummy_libintl.c -o /tmp/dummy_libintl.o
+           ar rcs /usr/lib/libintl.a /tmp/dummy_libintl.o
+           echo "已生成 stub /usr/lib/libintl.a"
+         fi
          ./configure LDFLAGS="$LDFLAGS -static" CFLAGS="$CFLAGS -static" --disable-shared --enable-static --enable-static-bin --prefix=$HOME/iperf3
          make 
          make install 
@@ -247,6 +256,7 @@ jobs:
        with:
         name: iperf3-${{ needs.check.outputs.ver }}-${{ matrix.target }}
         path: bin/*
+        retention-days: 1
      - name: 设置变量
        if: github.event.inputs.rel != 'true'
        run: |
